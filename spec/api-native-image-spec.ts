@@ -447,6 +447,21 @@ describe('nativeImage module', () => {
       const result = await nativeImage.createThumbnailFromPath(goodPath, goodSize);
       expect(result.isEmpty()).to.equal(false);
     });
+
+    it('returns the correct size if smaller than the maximum size', async () => {
+      // capybara.png is a 28x128 image.
+      const goodPath = path.join(fixturesPath, 'assets', 'capybara.png');
+      const result = await nativeImage.createThumbnailFromPath(goodPath, { width: 2000, height: 2000 });
+      expect(result.getSize()).to.deep.equal({ width: 128, height: 128 });
+    });
+
+    it('enforces the maximum size if smaller than default size', async () => {
+      // capybara.png is a 28x128 image.
+      const goodPath = path.join(fixturesPath, 'assets', 'capybara.png');
+      const maxSize = { width: 100, height: 100 };
+      const result = await nativeImage.createThumbnailFromPath(goodPath, maxSize);
+      expect(result.getSize()).to.deep.equal(maxSize);
+    });
   });
 
   describe('addRepresentation()', () => {

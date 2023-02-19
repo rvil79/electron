@@ -39,20 +39,37 @@ double safeShift(double in, double def) {
   return def;
 }
 
+CGSize getSizefromPath(const base::FilePath& path, const gfx::Size& max_size) {
+  base::ScopedCFTypeRef<CFURLRef> url = base::mac::FilePathToCFURL(path);
+  base::ScopedCFTypeRef<CGImageSourceRef> source(
+      CGImageSourceCreateWithURL(url, nullptr));
+  base::ScopedCFTypeRef<CGImageRef> ref(
+      CGImageSourceCreateImageAtIndex(source, 0, nullptr));
+
+  int default_width = CGImageGetWidth(ref);
+  int default_height = CGImageGetHeight(ref);
+  int width =
+      default_width < max_size.width() ? default_width : max_size.width();
+  int height =
+      default_height < max_size.height() ? default_height : max_size.height();
+
+  return CGSizeMake(width, height);
+}
+
 // static
 v8::Local<v8::Promise> NativeImage::CreateThumbnailFromPath(
     v8::Isolate* isolate,
     const base::FilePath& path,
-    const gfx::Size& size) {
+    const gfx::Size& max_size) {
   gin_helper::Promise<gfx::Image> promise(isolate);
   v8::Local<v8::Promise> handle = promise.GetHandle();
 
-  if (size.IsEmpty()) {
+  if (max_size.IsEmpty()) {
     promise.RejectWithErrorMessage("size must not be empty");
     return handle;
   }
 
-  CGSize cg_size = size.ToCGSize();
+  CGSize cg_size = getSizefromPath(path, max_size);
 
   if (@available(macOS 10.15, *)) {
     NSURL* nsurl = base::mac::FilePathToNSURL(path);

@@ -81,7 +81,7 @@ class NativeImage : public gin::Wrappable<NativeImage> {
   static v8::Local<v8::Promise> CreateThumbnailFromPath(
       v8::Isolate* isolate,
       const base::FilePath& path,
-      const gfx::Size& size);
+      const gfx::Size& max_size);
 #endif
 
   enum class OnConvertError { kThrow, kWarn };
