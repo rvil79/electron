@@ -1966,6 +1966,19 @@ describe('default behavior', () => {
       }
     });
   });
+
+  describe('about panel', () => {
+    it('app.setAboutPanelOptions() does not crash', () => {
+      app.setAboutPanelOptions({
+        applicationName: 'electron!!',
+        version: '1.2.3'
+      });
+    });
+
+    it('app.showAboutPanel() does not crash', () => {
+      app.showAboutPanel();
+    });
+  });
 });
 
 async function runTestApp (name: string, ...args: any[]) {
