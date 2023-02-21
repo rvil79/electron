@@ -23,14 +23,14 @@ namespace electron::api {
 v8::Local<v8::Promise> NativeImage::CreateThumbnailFromPath(
     v8::Isolate* isolate,
     const base::FilePath& path,
-    const gfx::Size& size) {
+    const gfx::Size& max_size) {
   base::win::ScopedCOMInitializer scoped_com_initializer;
 
   gin_helper::Promise<gfx::Image> promise(isolate);
   v8::Local<v8::Promise> handle = promise.GetHandle();
   HRESULT hr;
 
-  if (size.IsEmpty()) {
+  if (max_size.IsEmpty()) {
     promise.RejectWithErrorMessage("size must not be empty");
     return handle;
   }
@@ -61,9 +61,18 @@ v8::Local<v8::Promise> NativeImage::CreateThumbnailFromPath(
   Microsoft::WRL::ComPtr<ISharedBitmap> pThumbnail;
   WTS_CACHEFLAGS flags;
   WTS_THUMBNAILID thumbId;
-  hr = pThumbnailCache->GetThumbnail(pItem.Get(), size.width(),
+  hr = pThumbnailCache->GetThumbnail(pItem.Get(), max_size.width(),
                                      WTS_FLAGS::WTS_NONE, &pThumbnail, &flags,
                                      &thumbId);
+
+  // If the thumbnail size is smaller than the requested size (max_size),
+  // WTS_LOWQUALITY will be set in WTS_CACHEFLAGS. If it is *not* set, that
+  // means the image is bigger than max_size and we must scale it down.
+  if ((flags & WTS_CACHEFLAGS::WTS_LOWQUALITY) == 0) {
+    hr = pThumbnailCache->GetThumbnail(pItem.Get(), max_size.width(),
+                                       WTS_FLAGS::WTS_SCALETOREQUESTEDSIZE,
+                                       &pThumbnail, &flags, &thumbId);
+  }
 
   if (FAILED(hr)) {
     promise.RejectWithErrorMessage(
