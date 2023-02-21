@@ -743,9 +743,8 @@ void Browser::ShowAboutPanel() {
   dict.SetStringKey("applicationName", exe_info->file_description());
   dict.SetStringKey("applicationVersion", exe_info->product_version());
 
-  if (about_panel_options_.is_dict()) {
-    dict.MergeDictionary(&about_panel_options_);
-  }
+  // Merge user-provided options, overwriting any of the above
+  dict.MergeDictionary(&about_panel_options_);
 
   std::vector<std::string> stringOptions = {
       "applicationName", "applicationVersion", "copyright", "credits"};
@@ -770,7 +769,7 @@ void Browser::ShowAboutPanel() {
 }
 
 void Browser::SetAboutPanelOptions(base::Value::Dict options) {
-  about_panel_options_ = base::Value(std::move(options));
+  about_panel_options_ = std::move(options);
 }
 
 }  // namespace electron
