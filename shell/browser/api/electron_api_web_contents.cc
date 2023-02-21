@@ -1505,7 +1505,8 @@ content::JavaScriptDialogManager* WebContents::GetJavaScriptDialogManager(
 }
 
 void WebContents::OnAudioStateChanged(bool audible) {
-  Emit("-audio-state-changed", audible);
+  DCHECK_EQ(audible, IsCurrentlyAudible());
+  Emit("audio-state-changed", audible);
 }
 
 void WebContents::BeforeUnloadFired(bool proceed,
