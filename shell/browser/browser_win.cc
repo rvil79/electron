@@ -734,29 +734,29 @@ void Browser::ShowEmojiPanel() {
 }
 
 void Browser::ShowAboutPanel() {
-  base::Value dict(base::Value::Type::DICTIONARY);
+  base::Value::Dict dict();
   std::string aboutMessage = "";
   gfx::ImageSkia image;
 
   // grab defaults from Windows .EXE file
   std::unique_ptr<FileVersionInfo> exe_info = FetchFileVersionInfo();
-  dict.SetStringKey("applicationName", exe_info->file_description());
-  dict.SetStringKey("applicationVersion", exe_info->product_version());
+  dict.Set("applicationName", exe_info->file_description());
+  dict.Set("applicationVersion", exe_info->product_version());
 
   // Merge user-provided options, overwriting any of the above
-  dict.MergeDictionary(&about_panel_options_);
+  dict.Merge(about_panel_options_.Clone());
 
   std::vector<std::string> stringOptions = {
       "applicationName", "applicationVersion", "copyright", "credits"};
 
   const std::string* str;
   for (std::string opt : stringOptions) {
-    if ((str = dict.FindStringKey(opt))) {
+    if ((str = dict.FindString(opt))) {
       aboutMessage.append(*str).append("\r\n");
     }
   }
 
-  if ((str = dict.FindStringKey("iconPath"))) {
+  if ((str = dict.FindString("iconPath"))) {
     base::FilePath path = base::FilePath::FromUTF8Unsafe(*str);
     electron::util::PopulateImageSkiaRepsFromPath(&image, path);
   }
