@@ -734,7 +734,7 @@ void Browser::ShowEmojiPanel() {
 }
 
 void Browser::ShowAboutPanel() {
-  base::Value::Dict dict();
+  base::Value::Dict dict;
   std::string aboutMessage = "";
   gfx::ImageSkia image;
 
