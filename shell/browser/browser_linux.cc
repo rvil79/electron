@@ -199,7 +199,7 @@ void Browser::ShowAboutPanel() {
 
   if ((list = opts.FindList("authors"))) {
     std::vector<const char*> cstrs;
-    for (const auto& authorVal : list) {
+    for (const auto& authorVal : *list) {
       if (authorVal.is_string()) {
         cstrs.push_back(authorVal.GetString().c_str());
       }
