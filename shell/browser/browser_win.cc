@@ -765,7 +765,7 @@ void Browser::ShowAboutPanel() {
   settings.message = aboutMessage;
   settings.icon = image;
   settings.type = electron::MessageBoxType::kInformation;
-  electron::ShowMessageBoxSync(settings);
+  electron::ShowMessageBox(settings);
 }
 
 void Browser::SetAboutPanelOptions(base::Value::Dict options) {
